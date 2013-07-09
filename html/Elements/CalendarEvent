@@ -2,6 +2,9 @@
 $Date => undef
 $Object => undef
 $DateTypes => undef
+$Class     => 'RT__Ticket'
+@Format    => undef
+$ColumnMap => {}
 </%args>
 <div class="tooltip">
 <small>
@@ -70,6 +73,69 @@ $DateTypes => undef
 % }
 
 <br />
+
+<%perl>
+foreach my $col ( @Format ) {
+    my $title = $col->{'title'} || '';
+    if ( $title eq 'NEWLINE' ) {
+        $m->out(qq{<br />});
+        next;
+    } elsif ( $title eq 'NBSP' ) {
+        $m->out(qq{&nbsp;\n});
+        next;
+    }
+
+    # if title is not defined then use defined attribute or last
+    # one we saw in the format
+    unless ( defined $col->{'title'} ) {
+        my $attr = $col->{'attribute'} || $col->{'last_attribute'};
+        my $tmp = $m->comp( '/Elements/ColumnMap',
+            Class => $Class,
+            Name  => $attr,
+            Attr  => 'title',
+        );
+        $title = ProcessColumnMapValue( $tmp, Arguments => [ $attr ] );
+
+        # in case title is not defined in ColumnMap 
+        # the following regex changes $attr like from "ReferredToBy" to "Referred To By"
+        $title = join ' ', split /(?<=[a-z])(?=[A-Z])/, $attr unless defined $title;
+    } else {
+        $title = $m->comp('/Elements/ScrubHTML', Content => $title);
+    }
+
+    my @out;
+    foreach my $subcol ( @{ $col->{output} } ) {
+        my ($col) = ($subcol =~ /^__(.*?)__$/);
+        unless ( $col ) {
+            push @out, $subcol;
+            next;
+        }
+
+        unless ( exists $ColumnMap->{$col}{'value'} ) {
+            $ColumnMap->{$col}{'value'} = $m->comp(
+                "/Elements/ColumnMap",
+                Class => $Class,
+                Name  => $col,
+                Attr  => 'value'
+            );
+        }
+
+        push @out, ProcessColumnMapValue(
+            $ColumnMap->{$col}{'value'},
+            Arguments => [$Object],
+        );
+    }
+    s/\n/<br \/>/gs for grep defined $_, @out;
+
+
+    $m->out( '<strong>' . loc($title) . ':</strong> ' );
+
+    $m->out(@out) if @out;
+
+    $m->out('<br />');
+}
+</%perl>
+
 	</span>
 </div>
 
