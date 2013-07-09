@@ -16,10 +16,10 @@ $NewQuery => 0
 %    $PYear--;
 %    $PMonth = 11;
 % }
-<a href="<%$RT::WebPath%>/Search/Calendar.html?Month=<%$PMonth%>&Year=<%$PYear%>&<%$QueryString%>">«<%$rtdate->GetMonth($PMonth)%></a>
+<a href="<%$RT::WebPath%>/Search/Calendar.html?Month=<%$PMonth%>&Year=<%$PYear%>&<%$QueryString%>">&laquo;<%$rtdate->GetMonth($PMonth)%></a>
 </td>
 <td align="center">
-<a href="<%$RT::WebPath%>/Prefs/Calendar.html">Calendar Preferences and Help</a>
+<% $rtdate->GetMonth($Month) . " $Year" %>
 </td>
 <td align="right">
 % my ($NMonth, $NYear) = ($Month + 1, $Year);
@@ -27,7 +27,7 @@ $NewQuery => 0
 %    $NYear++;
 %    $NMonth = 0;
 % }
-<a href="<%$RT::WebPath%>/Search/Calendar.html?Month=<%$NMonth%>&Year=<%$NYear%>&<%$QueryString%>"><%$rtdate->GetMonth($NMonth)%>»</a>
+<a href="<%$RT::WebPath%>/Search/Calendar.html?Month=<%$NMonth%>&Year=<%$NYear%>&<%$QueryString%>"><%$rtdate->GetMonth($NMonth)%>&raquo;</a>
 </td>
 </tr>
 </table>
@@ -67,18 +67,9 @@ $NewQuery => 0
 <table width="100%">
 <tr>
 <td align="left">
-<a href="<%$RT::WebPath%>/Search/Calendar.html?Month=<%$PMonth%>&Year=<%$PYear%>&<%$QueryString%>">«<%$rtdate->GetMonth($PMonth)%></a>
+<a href="<%$RT::WebPath%>/Search/Calendar.html?Month=<%$PMonth%>&Year=<%$PYear%>&<%$QueryString%>">&laquo;<%$rtdate->GetMonth($PMonth)%></a>
 </td>
-<td align="right">
-<a href="<%$RT::WebPath%>/Search/Calendar.html?Month=<%$NMonth%>&Year=<%$NYear%>&<%$QueryString%>"><%$rtdate->GetMonth($NMonth)%>»</a>
-</td>
-</tr>
-</table>
-
-
-<table width="100%">
-<tr>
-<td valign="top" align="center" width="80%">
+<td align="center">
 <form action="<%$RT::WebPath%>/Search/Calendar.html?<%$QueryString%>" method="post">
 
 <select name="Month">
@@ -92,9 +83,20 @@ $NewQuery => 0
 <option value="<%$_%>" <% $_ == $Year ? 'selected' : ''%>><%$_%></option>
 % }
 </select>
-
-<& /Elements/Submit&>
+<input type="submit" class="button" />
 </form>
+</td>
+<td align="right">
+<a href="<%$RT::WebPath%>/Search/Calendar.html?Month=<%$NMonth%>&Year=<%$NYear%>&<%$QueryString%>"><%$rtdate->GetMonth($NMonth)%>&raquo;</a>
+</td>
+</tr>
+</table>
+
+
+<table width="100%">
+<tr>
+<td valign="bottom" align="left" width="80%">
+<a href="<%$RT::WebPath%>/Prefs/Calendar.html">Calendar Preferences and Help</a>
 </td>
 <td valign="top" width="50%" align="right">
 <img src="<%$RT::WebImagesURL%>/created.png" /> : <&|/l&>Created</&><br />
