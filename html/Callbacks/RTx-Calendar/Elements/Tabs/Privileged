@@ -55,11 +55,11 @@ my $query_string = sub {
     return $u->query;
 };
 
-if ( $request_path =~ qr{^/Search/} && $m->request_args->{Query} ) {
+if ( $request_path =~ qr{^/Search/} && $DECODED_ARGS->{Query} ) {
     my $tabs = PageMenu;
     my $chart = $tabs->child('chart');
     $chart->add_after( 'calendar' => title => loc('Calendar'),
-                       path => '/Search/Calendar.html?' . $query_string->( %{$m->request_args} ) );
+                       path => '/Search/Calendar.html?' . $query_string->( %{$DECODED_ARGS} ) );
 }
 
 my $about_me = Menu->child( 'preferences' );
