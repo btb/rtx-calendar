@@ -1,0 +1,160 @@
+<%args>
+$Month => (localtime)[4]
+$Year => (localtime)[5] + 1900
+$Query => undef
+$Format => undef
+$Order => undef
+$OrderBy => undef
+$RowsPerPage => undef
+$NewQuery => 0
+</%args>
+<table width="100%">
+<tr>
+<td align="left">
+% my ($PMonth, $PYear) = ($Month - 1, $Year);
+% if ($PMonth < 0) {
+%    $PYear--;
+%    $PMonth = 11;
+% }
+<a href="<%$RT::WebPath%>/Search/Calendar.html?Month=<%$PMonth%>&Year=<%$PYear%>&<%$QueryString%>">&laquo;<%$rtdate->GetMonth($PMonth)%></a>
+</td>
+<td align="center">
+<% $rtdate->GetMonth($Month) . " $Year" %>
+</td>
+<td align="right">
+% my ($NMonth, $NYear) = ($Month + 1, $Year);
+% if ($NMonth > 11) {
+%    $NYear++;
+%    $NMonth = 0;
+% }
+<a href="<%$RT::WebPath%>/Search/Calendar.html?Month=<%$NMonth%>&Year=<%$NYear%>&<%$QueryString%>"><%$rtdate->GetMonth($NMonth)%>&raquo;</a>
+</td>
+</tr>
+</table>
+
+<table class="rtxcalendar">
+<thead>
+<tr>
+<th></th>
+% for (1 .. 6, 0) {
+<th width="14%"><%$rtdate->GetWeekday($_)%></th>
+% }
+</tr>
+</thead>
+<tbody>
+<tr>
+% while ($date <= $end) {
+%   if ( $date->day_of_week == 1) {
+<th><% $date->week_number %></th>
+%   }
+<td class="<% $date->month != ($Month + 1) ? 'oddline' : '' %>"
+    style="width:14%;<%  DateTime->compare($today, $date) == 0 ? 'background:#f6f7f8;' : '' %>"
+>
+<p class="date"><%$date->day%></p>
+% for my $t ( @{ $Tickets{$date->strftime("%F")} } ) {
+<& /Elements/CalendarEvent, Object => $t, Date => $date, DateTypes => \%DateTypes, Format => \@Format &>
+% }
+</td>
+% $date = $set->next($date);
+% if ( $date->day_of_week == 1) {
+</tr><tr>
+% }
+% }
+</tr>
+</tbody>
+</table>
+
+<table width="100%">
+<tr>
+<td align="left">
+<a href="<%$RT::WebPath%>/Search/Calendar.html?Month=<%$PMonth%>&Year=<%$PYear%>&<%$QueryString%>">&laquo;<%$rtdate->GetMonth($PMonth)%></a>
+</td>
+<td align="center">
+<form action="<%$RT::WebPath%>/Search/Calendar.html?<%$QueryString%>" method="post">
+
+<select name="Month">
+% for (0..11) {
+<option value="<%$_%>" <% $_ == $Month ? 'selected' : ''%> ><%$rtdate->GetMonth($_)%></option>
+% }
+</select>
+% my $year = (localtime)[5] + 1900;
+<select name="Year">
+% for ( ($year-5) .. ($year+5)) {
+<option value="<%$_%>" <% $_ == $Year ? 'selected' : ''%>><%$_%></option>
+% }
+</select>
+<input type="submit" class="button" />
+</form>
+</td>
+<td align="right">
+<a href="<%$RT::WebPath%>/Search/Calendar.html?Month=<%$NMonth%>&Year=<%$NYear%>&<%$QueryString%>"><%$rtdate->GetMonth($NMonth)%>&raquo;</a>
+</td>
+</tr>
+</table>
+
+
+<table width="100%">
+<tr>
+<td valign="bottom" align="left" width="80%">
+<a href="<%$RT::WebPath%>/Prefs/Calendar.html">Calendar Preferences and Help</a>
+</td>
+<td valign="top" width="50%" align="right">
+<img src="<%$RT::WebImagesURL%>/created.png" /> : <&|/l&>Created</&><br />
+<img src="<%$RT::WebImagesURL%>/due.png" /> : <&|/l&>Due</&><br />
+<img src="<%$RT::WebImagesURL%>/resolved.png" /> : <&|/l&>Resolved</&><br />
+<img src="<%$RT::WebImagesURL%>/updated.png" /> : <&|/l&>Last Updated</&><br />
+<img src="<%$RT::WebImagesURL%>/created_due.png" /> : <&|/l&>Created</&>, <&|/l&>Due</&><br />
+<img src="<%$RT::WebImagesURL%>/reminder.png" /> : <&|/l&>Reminders</&><br />
+<img src="<%$RT::WebImagesURL%>/starts.png" /> : <&|/l&>Starts</&><br />
+<img src="<%$RT::WebImagesURL%>/started.png" /> : <&|/l&>Started</&><br />
+<img src="<%$RT::WebImagesURL%>/starts_due.png" /> : <&|/l&>Starts</&>, <&|/l&>Due</&><br />
+
+
+</td>
+</table>
+<%INIT>
+use RTx::Calendar;
+
+my @DateTypes = qw/Created Starts Started Due LastUpdated Resolved/;
+
+my $rtdate = RT::Date->new($session{'CurrentUser'});
+
+my $today = DateTime->today;
+my $date  = RTx::Calendar::FirstMonday($Year, $Month + 1);
+my $end   = RTx::Calendar::LastSunday($Year, $Month + 1);
+
+# use this to loop over days until $end
+my $set = DateTime::Set->from_recurrence(
+    next => sub { $_[0]->truncate( to => 'day' )->add( days => 1 ) }
+);
+
+my $QueryString =
+      $m->comp(
+        '/Elements/QueryString',
+        Query   => $Query,
+        Format  => $Format,
+        Order   => $Order,
+        OrderBy => $OrderBy,
+        Rows    => $RowsPerPage,
+        SavedSearchId => $ARGS{'SavedSearchId'},
+      )
+      if ($Query);
+
+$QueryString ||= 'NewQuery=1';
+
+# we search all date types in Format string
+my @Dates = grep { $Format =~ m/__${_}(Relative)?__/ } @DateTypes;
+
+# used to display or not a date in Element/CalendarEvent
+my %DateTypes = map { $_ => 1 } @Dates;
+
+# print STDERR ("-" x 30), "\n", $Query, "\n";
+
+my %Tickets = RTx::Calendar::FindTickets($session{'CurrentUser'}, $Query, \@Dates, $date->strftime("%F"), $end->strftime("%F"));
+
+# Scrub the html of the format string to remove any potential nasties.
+$Format = $m->comp('/Elements/ScrubHTML', Content => $Format);
+
+my @Format = $m->comp('/Elements/CollectionAsTable/ParseFormat', Format => $Format);
+
+</%INIT>

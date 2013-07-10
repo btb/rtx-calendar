@@ -1,6 +1,6 @@
 <&|/Widgets/TitleBox,
     title => loc("Calendar"),
-    title_href => "Search/Calendar.html" &>
+    title_href => RT->Config->Get('WebPath') . "/Search/Calendar.html" &>
 
 <table class="rtxcalendar">
 <thead>
