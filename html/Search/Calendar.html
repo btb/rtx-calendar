@@ -42,13 +42,16 @@ $Year => (localtime)[5] + 1900
 <%init>
 
 # Default Query and Format
+if ( my $Search = RTx::Calendar::SearchDefaultCalendar($session{CurrentUser}) ) {
+    $ARGS{'Format'} ||= $Search->SubValue('Format');
+    $ARGS{'Query'}  ||= $Search->SubValue('Query');
+}
 $ARGS{'Format'} ||= "__Starts__ __Due__";
 $ARGS{'Query'} ||= "( Status = 'new' OR Status = 'open' OR Status = 'stalled')
  AND ( Owner = '" . $session{CurrentUser}->Id ."' OR Owner = 'Nobody'  )
  AND ( Type = 'reminder' OR 'Type' = 'ticket' )";
 
 my @results;
-
 my @save_arguments = qw(Query Format OrderBy Order RowsPerPage);
 my $saved_search = { Type => 'Calendar' };
 my %query;
