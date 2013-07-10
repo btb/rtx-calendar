@@ -46,15 +46,12 @@ CONFIGURATION
     CreateSavedSearch and LoadSavedSearch rights to your users.
 
   Display configuration
-    You can show the owner in each day box by adding this line to your
-    etc/RT_SiteConfig.pm :
+    Display is determined by the format string of the current
+    search. The first "column" of the format will be shown in the day
+    box, the rest of the format is shown in the popup.
 
-        Set($CalendarDisplayOwner, 1);
-
-    You can change which fields show up in the popup display when you mouse
-    over a date in etc/RT_SiteConfig.pm :
-
-        @CalendarPopupFields = ('Status', 'OwnerObj->Name', 'DueObj->ISO');
+    You can set the default format to use by setting
+    $DefaultCalendarFormat in your etc/RT_SiteConfig.pm :
 
   ICAL feed configuration
     By default, tickets are todo and reminders event. You can change this by
