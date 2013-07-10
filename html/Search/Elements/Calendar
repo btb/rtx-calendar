@@ -135,37 +135,21 @@ my $QueryString =
         Format  => $Format,
         Order   => $Order,
         OrderBy => $OrderBy,
-        Rows    => $RowsPerPage
+        Rows    => $RowsPerPage,
+        SavedSearchId => $ARGS{'SavedSearchId'},
       )
       if ($Query);
 
 $QueryString ||= 'NewQuery=1';
 
-# Default Query and Format
-my $TempFormat = "__Starts__ __Due__";
-my $TempQuery = "( Status = 'new' OR Status = 'open' OR Status = 'stalled')
- AND ( Owner = '" . $session{CurrentUser}->Id ."' OR Owner = 'Nobody'  )
- AND ( Type = 'reminder' OR 'Type' = 'ticket' )";
-
-if ( my $Search = RTx::Calendar::SearchDefaultCalendar($session{CurrentUser}) ) {
-  $TempFormat = $Search->SubValue('Format');
-  $TempQuery = $Search->SubValue('Query');
-}
-
-# we overide them if needed
-$TempQuery  = $Query  if $Query;
-$TempFormat = $Format if $Format;
-
 # we search all date types in Format string
-my @Dates = grep { $TempFormat =~ m/__${_}(Relative)?__/ } @DateTypes;
+my @Dates = grep { $Format =~ m/__${_}(Relative)?__/ } @DateTypes;
 
 # used to display or not a date in Element/CalendarEvent
 my %DateTypes = map { $_ => 1 } @Dates;
 
-$TempQuery .= RTx::Calendar::DatesClauses(\@Dates, $date->strftime("%F"), $end->strftime("%F"));
+# print STDERR ("-" x 30), "\n", $Query, "\n";
 
-# print STDERR ("-" x 30), "\n", $TempQuery, "\n";
-
-my %Tickets = RTx::Calendar::FindTickets($session{'CurrentUser'}, $TempQuery, \@Dates, $date->strftime("%F"), $end->strftime("%F"));
+my %Tickets = RTx::Calendar::FindTickets($session{'CurrentUser'}, $Query, \@Dates, $date->strftime("%F"), $end->strftime("%F"));
 
 </%INIT>

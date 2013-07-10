@@ -38,3 +38,17 @@ table.rtxcalendar tbody th {
     background: #eee;
     font-weight: normal;
 }
+.rtxcalendar-meta {
+    padding-top: 2em;
+    border-top: 1px solid #ccc;
+}
+
+.rtxcalendar-meta .rtxcalendar-properties {
+    display: inline-block;
+    float: left;
+    padding-right: 2em;
+}
+
+.rtxcalendar-meta .saved-search {
+    display: inline-block;
+}

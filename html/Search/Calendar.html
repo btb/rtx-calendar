@@ -1,36 +1,82 @@
 <%args>
 $Month => (localtime)[4]
 $Year => (localtime)[5] + 1900
-$Query => undef
-$Format => undef
-$Order => undef
-$OrderBy => undef
-$RowsPerPage => undef
-$NewQuery => 0
 </%args>
-
 <& /Elements/Header, Title => $title &>
 
 % if ( $m->comp_exists( '/Ticket/Elements/Tabs' ) ) {
 <& /Ticket/Elements/Tabs,
-    current_tab => "Search/Calendar.html",
+    current_tab => "Search/Calendar.html?" . $m->comp( '/Elements/QueryString', %query ),
     Title => $title &>
 % } else {
-    <& /Elements/Tabs &>
+    <& /Elements/Tabs, QueryArgs => \%query &>
 % }
+<& /Elements/ListActions, actions => \@results &>
 
 <&| /Widgets/TitleBox,
      title => $title,
      title_class=> 'inverse',
      color => "#993333" &>
-
-<& /Search/Elements/Calendar, %ARGS &>
-
+<& /Search/Elements/Calendar, %ARGS, %query &>
 </&>
 
-</html>
+<div class="rtxcalendar-meta">
+<form method="get" action="<%RT->Config->Get('WebPath')%>/Search/Calendar.html">
+% foreach my $var ( @save_arguments ) {
+<input type="hidden" class="hidden" name="<%$var%>" value="<%$query{$var} || ''%>" />
+%}
+
+<div class="saved-search">
+<input type="hidden" class="hidden" name="SavedSearchId" value="<% $saved_search->{Id} || 'new' %>" />
+<& /Search/Elements/EditSearches,
+    %$saved_search,
+    Title         => loc('Saved calendars'),
+    SearchFields  => \@save_arguments,
+    CurrentSearch => \%query,
+    AllowCopy     => 1,
+&>
+</div>
+
+</form>
+</div>
 <%init>
 
-my $title = loc("Calendar");
+# Default Query and Format
+if ( my $Search = RTx::Calendar::SearchDefaultCalendar($session{CurrentUser}) ) {
+    $ARGS{'Format'} ||= $Search->SubValue('Format');
+    $ARGS{'Query'}  ||= $Search->SubValue('Query');
+}
+$ARGS{'Format'} ||= "__Starts__ __Due__";
+$ARGS{'Query'} ||= "( Status = 'new' OR Status = 'open' OR Status = 'stalled')
+ AND ( Owner = '" . $session{CurrentUser}->Id ."' OR Owner = 'Nobody'  )
+ AND ( Type = 'reminder' OR 'Type' = 'ticket' )";
+
+my @results;
+my @save_arguments = qw(Query Format OrderBy Order RowsPerPage);
+my $saved_search = { Type => 'Calendar' };
+my %query;
+for( @save_arguments ) {
+    $query{$_} = $ARGS{$_};
+}
+
+push @results, $m->comp( '/Search/Elements/EditSearches:Init',
+    %ARGS,
+    Query        => \%query,
+    SavedSearch  => $saved_search,
+    SearchFields => \@save_arguments,
+);
+
+my $description = '';
+$description ||= $saved_search->{'Description'};
+$ARGS{'SavedSearchId'} ||= $saved_search->{'Id'};
+
+push @results, $m->comp( '/Search/Elements/EditSearches:Save',
+    %ARGS,
+    Query        => \%ARGS,
+    SavedSearch  => $saved_search,
+    SearchFields => \@save_arguments,
+);
+
+my $title = loc( "Calendar [_1]", $description );
 
 </%init>
