@@ -19,7 +19,7 @@
 <td>
 <p class="date"><%$date->day%></p>
 % for my $t (@{ $Tickets{$date->strftime("%F")} }) {
-<& /Elements/CalendarEvent, Object => $t, Date => $date, DateTypes => \%DateTypes &>
+<& /Elements/CalendarEvent, Object => $t, Date => $date, DateTypes => \%DateTypes, Format => \@Format &>
 % }
 </td>
 % $date = $set->next($date);
@@ -56,7 +56,7 @@ my $set = DateTime::Set->from_recurrence(
 my $Query = "( Status = 'new' OR Status = 'open' OR Status = 'stalled')
  AND ( Owner = '" . $session{CurrentUser}->Id ."' OR Owner = 'Nobody'  )
  AND ( Type = 'reminder' OR 'Type' = 'ticket' )";
-my $Format = "__Starts__ __Due__";
+my $Format = RT->Config->Get('DefaultCalendarFormat');
 
 if ( my $Search = RTx::Calendar::SearchDefaultCalendar($session{CurrentUser}) ) {
   $Format = $Search->SubValue('Format');
@@ -74,5 +74,10 @@ $Query .= RTx::Calendar::DatesClauses(\@Dates, $begin->strftime("%F"), $end->str
 # print STDERR $Query, "\n";
 
 my %Tickets = RTx::Calendar::FindTickets($session{'CurrentUser'}, $Query, \@Dates);
+
+# Scrub the html of the format string to remove any potential nasties.
+$Format = $m->comp('/Elements/ScrubHTML', Content => $Format);
+
+my @Format = $m->comp('/Elements/CollectionAsTable/ParseFormat', Format => $Format);
 
 </%INIT>

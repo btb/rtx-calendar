@@ -46,35 +46,9 @@ $ColumnMap => {}
 
 % }
 
-	<a href="<%$RT::WebPath%>/Ticket/Display.html?id=<%$TicketId%>">
-           <% $Object->QueueObj->Name %> #<% $TicketId %>
-           <% $display_owner ? 'by ' . $Object->OwnerObj->Name : '' %>
-           <% length($Object->Subject) > 80 ? substr($Object->Subject, 0, 77) . "..." : $Object->Subject %></a></small><br />
-	<span class="tip">
-	<a href="<%$RT::WebPath%>/Ticket/Display.html?id=<%$TicketId%>">
-           <% $Object->QueueObj->Name %> #<% $TicketId %>
-        </a>
-	:</strong> <% $subject%><br />
-	<br />
-
-%# logic taken from Ticket/Search/Results.tsv
-% foreach my $attr (@display_fields) {
-%    my $value;
-%
-%    if ($attr =~ /(.*)->ISO$/ and $Object->$1->Unix <= 0) {
-%        $value = '-';
-%    } else {
-%        my $method = '$Object->'.$attr.'()';
-%        $method =~ s/->ISO\(\)$/->ISO( Timezone => 'user' )/;
-%        $value = eval $method;
-%        if ($@) {die "<b>Check your CalendarPopupFields config in etc/RT_SiteConfig.pm</b>.<br /><br />Failed to find \"$attr\" - ". $@};
-%    }
-	<strong><&|/l&><% $label_of{$attr} %></&>:</strong> <% $value %><br />
-% }
-
-<br />
-
 <%perl>
+
+my $i = 0;
 foreach my $col ( @Format ) {
     my $title = $col->{'title'} || '';
     if ( $title eq 'NEWLINE' ) {
@@ -128,10 +102,14 @@ foreach my $col ( @Format ) {
     s/\n/<br \/>/gs for grep defined $_, @out;
 
 
-    $m->out( '<strong>' . loc($title) . ':</strong> ' );
-
+    $m->out( '<strong>' . loc($title) . ':</strong> ' ) if $title;
     $m->out(@out) if @out;
 
+    unless ( $i++ ) {
+        $m->out( '<br /></small><span class="tip">' );
+        $m->out( '<strong>' . loc($title) . ':</strong> ' ) if $title;
+        $m->out(@out) if @out;
+    }
     $m->out('<br />');
 }
 </%perl>

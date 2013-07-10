@@ -68,7 +68,7 @@ $NewQuery => 0
 >
 <p class="date"><%$date->day%></p>
 % for my $t ( @{ $Tickets{$date->strftime("%F")} } ) {
-<& /Elements/CalendarEvent, Object => $t, Date => $date, DateTypes => \%DateTypes &>
+<& /Elements/CalendarEvent, Object => $t, Date => $date, DateTypes => \%DateTypes, Format => \@Format &>
 % }
 </td>
 % $date = $set->next($date);
@@ -162,7 +162,8 @@ my $QueryString =
 $QueryString ||= 'NewQuery=1';
 
 # Default Query and Format
-my $TempFormat = "__Starts__ __Due__";
+my $TempFormat = RT->Config->Get('DefaultCalendarFormat');
+
 my $TempQuery = "( Status = 'new' OR Status = 'open' OR Status = 'stalled')
  AND ( Owner = '" . $session{CurrentUser}->Id ."' OR Owner = 'Nobody'  )
  AND ( Type = 'reminder' OR 'Type' = 'ticket' )";
@@ -187,5 +188,10 @@ $TempQuery .= RTx::Calendar::DatesClauses(\@Dates, $date->strftime("%F"), $end->
 # print STDERR ("-" x 30), "\n", $TempQuery, "\n";
 
 my %Tickets = RTx::Calendar::FindTickets($session{'CurrentUser'}, $TempQuery, \@Dates, $date->strftime("%F"), $end->strftime("%F"));
+
+# Scrub the html of the format string to remove any potential nasties.
+$TempFormat = $m->comp('/Elements/ScrubHTML', Content => $TempFormat);
+
+my @Format = $m->comp('/Elements/CollectionAsTable/ParseFormat', Format => $TempFormat);
 
 </%INIT>
