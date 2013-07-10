@@ -138,6 +138,8 @@ my $QueryString =
         Order   => $Order,
         OrderBy => $OrderBy,
         Rows    => $RowsPerPage,
+        TimeSpanOpen  => $TimeSpanOpen,
+        TimeSpanClose => $TimeSpanClose,
         SavedSearchId => $ARGS{'SavedSearchId'},
       )
       if ($Query);
