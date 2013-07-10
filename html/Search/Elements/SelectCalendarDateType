@@ -1,0 +1,10 @@
+<%args>
+$Name
+$Default => ''
+</%args>
+<select id="<% $Name %>" name="<% $Name %>">
+ <option value="" <% $Default ? '' : q[selected="selected" ] %>>-</option>
+% for my $type ( qw(Created Starts Started Due Resolved LastUpdated) ) {
+ <option value="<% $type %>" <% ($Name eq $type) ? q[selected="selected" ] : '' %>><% $type %></option>
+% }
+</select>

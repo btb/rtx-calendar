@@ -31,6 +31,14 @@ $Year => (localtime)[5] + 1900
 <&|/l&>Calendar Type:</&>
 <& Elements/SelectCalendarType, Name => 'CalendarType', Default => $query{'CalendarType'} &>
 
+<&|/l_unsafe, $m->scomp('Elements/SelectCalendarDateType',
+                        Name => 'TimeSpanOpen',
+                        Default => $query{'TimeSpanOpen'}),
+              $m->scomp('Elements/SelectCalendarDateType',
+                        Name => 'TimeSpanClose',
+                        Default => $query{'TimeSpanClose'}) 
+&>Always display tickets between [_1] and [_2]</&>
+
 <input type="submit" class="button" value="<%loc('Update Calendar')%>" />
 </&>
 </div>
@@ -68,11 +76,15 @@ $ARGS{'RowsPerPage'} ||= '50';
 $ARGS{'CalendarType'} ||= 'month';
 
 my @results;
-my @save_arguments = qw(Query Format OrderBy Order RowsPerPage CalendarType);
+my @save_arguments = qw(Query Format OrderBy Order RowsPerPage CalendarType TimeSpanOpen TimeSpanClose);
 my $saved_search = { Type => 'Calendar' };
 my %query;
 for( @save_arguments ) {
     $query{$_} = $ARGS{$_};
+}
+unless ( $query{'TimeSpanOpen'} && $query{'TimeSpanClose'} ) {
+    delete $query{'TimeSpanOpen'};
+    delete $query{'TimeSpanClose'};
 }
 
 push @results, $m->comp( '/Search/Elements/EditSearches:Init',
