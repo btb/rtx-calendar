@@ -1,0 +1,14 @@
+<&|/l&>Always display tickets between</&>
+<select name="TimeSpanOpen">
+ <option value="" <% $ARGS{'TimeSpanOpen'} ? '' : q[selected="selected" ] %>>-</option>
+% for my $type ( qw(Created Starts Started Due Resolved LastUpdated) ) {
+ <option value="<% $type %>" <% ($ARGS{'TimeSpanOpen'} eq $type) ? q[selected="selected" ] : '' %>><% $type %></option>
+% }
+</select>
+<&|/l&>and</&>
+<select name="TimeSpanClose">
+ <option value="" <% $ARGS{'TimeSpanClose'} ? '' : q[selected="selected" ] %>>-</option>
+% for my $type ( qw(Created Starts Started Due Resolved LastUpdated) ) {
+ <option value="<% $type %>" <% ($ARGS{'TimeSpanClose'} eq $type) ? q[selected="selected" ] : '' %>><% $type %></option>
+% }
+</select>

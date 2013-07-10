@@ -6,6 +6,8 @@ $Format => undef
 $Order => undef
 $OrderBy => undef
 $RowsPerPage => undef
+$TimeSpanOpen => undef
+$TimeSpanClose => undef
 $NewQuery => 0
 </%args>
 <table width="100%">
@@ -145,12 +147,14 @@ $QueryString ||= 'NewQuery=1';
 # we search all date types in Format string
 my @Dates = grep { $Format =~ m/__${_}(Relative)?__/ } @DateTypes;
 
+push @Dates, "$TimeSpanOpen-$TimeSpanClose" if $TimeSpanOpen && $TimeSpanClose;
+
 # used to display or not a date in Element/CalendarEvent
 my %DateTypes = map { $_ => 1 } @Dates;
 
 # print STDERR ("-" x 30), "\n", $Query, "\n";
 
-my %Tickets = RTx::Calendar::FindTickets($session{'CurrentUser'}, $Query, \@Dates, $date->strftime("%F"), $end->strftime("%F"));
+my %Tickets = RTx::Calendar::FindTickets($session{'CurrentUser'}, $Query, \@Dates, $date, $end);
 
 # Scrub the html of the format string to remove any potential nasties.
 $Format = $m->comp('/Elements/ScrubHTML', Content => $Format);
