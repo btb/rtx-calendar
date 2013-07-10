@@ -55,7 +55,7 @@ if ( my $Search = RTx::Calendar::SearchDefaultCalendar($session{CurrentUser}) ) 
 }
 
 # Default Query and Format
-$ARGS{'Format'} = RT->Config->Get('DefaultCalendarFormat');
+$ARGS{'Format'} ||= RT->Config->Get('DefaultCalendarFormat');
 $ARGS{'Query'} ||= "( Status = 'new' OR Status = 'open' OR Status = 'stalled')
  AND ( Owner = '" . $session{CurrentUser}->Id ."' OR Owner = 'Nobody'  )
  AND ( Type = 'reminder' OR 'Type' = 'ticket' )";
