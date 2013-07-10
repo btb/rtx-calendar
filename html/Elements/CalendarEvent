@@ -140,34 +140,4 @@ if ($Object->Type eq 'reminder') {
     $subject = $Object->Subject;
 }
 
-my $display_owner = $RT::CalendarDisplayOwner;
-$display_owner ||= RT->Config->Get('CalendarDisplayOwner')
-    if RT->can('Config');
-
-
-# 3.6 config
-my @display_fields = @RT::CalendarPopupFields;
-
-# 3.8 config
-# the if condition is weird but it doesn't work with 3.8.0 without the last part
-@display_fields = RT->Config->Get('CalendarPopupFields')
-    if 0 == @display_fields and RT->can('Config') and RT->Config->Get('CalendarPopupFields');
-
-# default
-if (0 == @display_fields) {
-    @display_fields = qw(OwnerObj->Name CreatedObj->ISO StartsObj->ISO
-			 StartedObj->ISO LastUpdatedObj->ISO DueObj->ISO
-			 ResolvedObj->ISO Status Priority
-			 Requestors->MemberEmailAddressesAsString);
-}
-
-
-my %label_of;
-for my $field (@display_fields) {
-    my $label = $field;
-    $label =~ s'Obj-.(?:AsString|Name|ISO)''g;
-    $label =~ s'-\>MemberEmailAddressesAsString''g;
-    $label_of{$field} = $label;
-}
-
 </%init>
