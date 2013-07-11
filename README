@@ -46,10 +46,12 @@ CONFIGURATION
     CreateSavedSearch and LoadSavedSearch rights to your users.
 
   Display configuration
-    You can show the owner in each day box by adding this line to your
+    The text displayed in each day box is determined by the
+    DefaultCalendarBoxFormat config option.  For example, you can show
+    the owner in each day box by adding this line to your
     etc/RT_SiteConfig.pm :
 
-        Set($CalendarDisplayOwner, 1);
+        Set($DefaultCalendarBoxFormat, '__QueueName__ #__id__ by __OwnerName__ __Subject__');
 
     The fields of the popup display are determined by the format
     string of the current search.  You can set the default format to

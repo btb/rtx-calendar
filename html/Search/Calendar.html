@@ -18,6 +18,7 @@ $Year => (localtime)[5] + 1900
      title_class=> 'inverse',
      color => "#993333" &>
 <& /Search/Elements/Calendar, %ARGS, %query &>
+
 </&>
 
 <div class="rtxcalendar-meta">
@@ -62,6 +63,7 @@ if ( my $Search = RTx::Calendar::SearchDefaultCalendar($session{CurrentUser}) ) 
 }
 
 $ARGS{'Format'} ||= RT->Config->Get('DefaultCalendarFormat');
+$ARGS{'BoxFormat'} ||= RT->Config->Get('DefaultCalendarBoxFormat');
 $ARGS{'Query'} ||= "( Status = 'new' OR Status = 'open' OR Status = 'stalled')
  AND ( Owner = '" . $session{CurrentUser}->Id ."' OR Owner = 'Nobody'  )
  AND ( Type = 'reminder' OR 'Type' = 'ticket' )";
@@ -70,7 +72,6 @@ $ARGS{'Order'} ||= 'ASC';
 $ARGS{'RowsPerPage'} ||= '50';
 $ARGS{'TimeSpanOpen'} ||= '';
 $ARGS{'TimeSpanClose'} ||= '';
-$ARGS{'BoxFormat'} ||= '__QueueName__ #__id__ __Subject__';
 
 my @results;
 my @save_arguments = qw(Query Format OrderBy Order RowsPerPage TimeSpanOpen TimeSpanClose BoxFormat);
