@@ -73,8 +73,8 @@ push @results, $m->comp( '/Search/Elements/EditSearches:Init',
 );
 
 my $description = '';
-$description ||= $saved_search->{'Description'};
-$ARGS{'SavedSearchId'} ||= $saved_search->{'Id'};
+$description = $saved_search->{'Description'} if $saved_search->{'Description'};
+$ARGS{'SavedSearchId'} = $saved_search->{'Id'} if $saved_search->{'Id'};
 
 push @results, $m->comp( '/Search/Elements/EditSearches:Save',
     %ARGS,
