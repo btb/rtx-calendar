@@ -37,6 +37,7 @@ table.rtxcalendar tbody th {
     border: 1px solid #d7d7d7;
     background: #eee;
     font-weight: normal;
+    font-size: 0.67em;
 }
 
 .rtxcalendar-legend .query {
