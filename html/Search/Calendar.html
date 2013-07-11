@@ -171,6 +171,7 @@ $QueryString ||= 'NewQuery=1';
 
 # Default Query and Format
 my $TempFormat = RT->Config->Get('DefaultCalendarFormat');
+my $TempBoxFormat = RT->Config->Get('DefaultCalendarBoxFormat');
 
 my $TempQuery = "( Status = 'new' OR Status = 'open' OR Status = 'stalled')
  AND ( Owner = '" . $session{CurrentUser}->Id ."' OR Owner = 'Nobody'  )
@@ -184,6 +185,7 @@ if ( my $Search = RTx::Calendar::SearchDefaultCalendar($session{CurrentUser}) ) 
 # we overide them if needed
 $TempQuery  = $Query  if $Query;
 $TempFormat = $Format if $Format;
+$TempBoxFormat = $BoxFormat if $BoxFormat;
 
 # we search all date types in Format string
 my @Dates = grep { $TempFormat =~ m/__${_}(Relative)?__/ } @DateTypes;
@@ -199,9 +201,9 @@ my %Tickets = RTx::Calendar::FindTickets($session{'CurrentUser'}, $TempQuery, \@
 
 # Scrub the html of the format string to remove any potential nasties.
 $TempFormat = $m->comp('/Elements/ScrubHTML', Content => $TempFormat);
-$BoxFormat = $m->comp('/Elements/ScrubHTML', Content => $BoxFormat);
+$TempBoxFormat = $m->comp('/Elements/ScrubHTML', Content => $TempBoxFormat);
 
 my @Format = $m->comp('/Elements/CollectionAsTable/ParseFormat', Format => $TempFormat);
-my @BoxFormat = $m->comp('/Elements/CollectionAsTable/ParseFormat', Format => "'$BoxFormat'");
+my @BoxFormat = $m->comp('/Elements/CollectionAsTable/ParseFormat', Format => "'$TempBoxFormat'");
 
 </%INIT>
