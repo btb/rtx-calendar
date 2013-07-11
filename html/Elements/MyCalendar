@@ -69,7 +69,6 @@ if ( my $Search = RTx::Calendar::SearchDefaultCalendar($session{CurrentUser}) ) 
   $Format = $Search->SubValue('Format');
   $Query = $Search->SubValue('Query');
 }
-my $BoxFormat = '__QueueName__ #__id__ __Subject__';
 
 # we search all date types in Format string
 my @Dates = grep { $Format =~ m/__${_}(Relative)?__/ } @DateTypes;
