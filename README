@@ -46,12 +46,15 @@ CONFIGURATION
     CreateSavedSearch and LoadSavedSearch rights to your users.
 
   Display configuration
-    Display is determined by the format string of the current
-    search. The first "column" of the format will be shown in the day
-    box, the rest of the format is shown in the popup.
+    You can show the owner in each day box by adding this line to your
+    etc/RT_SiteConfig.pm :
 
-    You can set the default format to use by setting
-    $DefaultCalendarFormat in your etc/RT_SiteConfig.pm :
+        Set($CalendarDisplayOwner, 1);
+
+    The fields of the popup display are determined by the format
+    string of the current search.  You can set the default format to
+    use by adding Set($DefaultCalendarFormat, ...); to your
+    etc/RT_SiteConfig.pm
 
   ICAL feed configuration
     By default, tickets are todo and reminders event. You can change this by
