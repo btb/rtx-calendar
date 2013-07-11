@@ -38,6 +38,18 @@ table.rtxcalendar tbody th {
     background: #eee;
     font-weight: normal;
 }
+
+.rtxcalendar-legend .query {
+    clear: both;
+    text-align: center;
+    font-size: 1.2em;
+    padding: 1em;
+}
+
+.rtxcalendar-legend .query .label {
+    font-weight: bold;
+}
+
 .rtxcalendar-meta {
     padding-top: 2em;
     border-top: 1px solid #ccc;

@@ -137,10 +137,10 @@ $CalendarType => 'full'
 </table>
 
 
-<table width="100%">
+<table width="100%" class="rtxcalendar-legend">
 <tr>
 <td valign="bottom" align="left" width="80%">
-<a href="<%$RT::WebPath%>/Prefs/Calendar.html">Calendar Preferences and Help</a>
+<div class="query"><span class="label"><% loc('Query') %>:</span><span class="value"><% $Query %></span></div>
 </td>
 <td valign="top" width="50%" align="right">
 <img src="<%$RT::WebImagesURL%>/created.png" /> : <&|/l&>Created</&><br />
