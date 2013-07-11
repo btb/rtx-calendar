@@ -4,6 +4,7 @@ $Object => undef
 $DateTypes => undef
 $Class     => 'RT__Ticket'
 @Format    => undef
+@BoxFormat => undef
 $ColumnMap => {}
 </%args>
 <div class="tooltip">
@@ -46,15 +47,41 @@ $ColumnMap => {}
 
 % }
 
+<%perl>
+    my $col = $BoxFormat[0];
+    my @out;
+    foreach my $subcol ( @{ $col->{output} } ) {
+        my ($col) = ($subcol =~ /^__(.*?)__$/);
+        unless ( $col ) {
+            push @out, $subcol;
+            next;
+        }
+
+        unless ( exists $ColumnMap->{$col}{'value'} ) {
+            $ColumnMap->{$col}{'value'} = $m->comp(
+                "/Elements/ColumnMap",
+                Class => $Class,
+                Name  => $col,
+                Attr  => 'value'
+            );
+        }
+
+        push @out, ProcessColumnMapValue(
+            $ColumnMap->{$col}{'value'},
+            Arguments => [$Object],
+        );
+    }
+    s/\n/<br \/>/gs for grep defined $_, @out;
+
+    my $output = @out ? join( '', @out ) : '';
+</%perl>
 
 	<a href="<%$RT::WebPath%>/Ticket/Display.html?id=<%$TicketId%>">
-           <% $Object->QueueObj->Name %> #<% $TicketId %>
-           <% $display_owner ? 'by ' . $Object->OwnerObj->Name : '' %>
-           <% length($Object->Subject) > 80 ? substr($Object->Subject, 0, 77) . "..." : $Object->Subject %></a></small><br />
+           <% length($output) > 80 ? substr($output, 0, 77) . "..." : $output %>
+        </a></small><br />
 	<span class="tip">
 
 <%perl>
-
 foreach my $col ( @Format ) {
     my $title = $col->{'title'} || '';
     if ( $title eq 'NEWLINE' ) {

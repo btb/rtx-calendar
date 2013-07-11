@@ -28,6 +28,9 @@ $Year => (localtime)[5] + 1900
 <div class="rtxcalendar-properties">
 <&| /Widgets/TitleBox, title => loc('Calendar Properties')&>
 
+<&|/l&>Box display format:</&>
+<input id="BoxFormat" name="BoxFormat" value="<% $query{'BoxFormat'} %>" size="50" />
+<br />
 <& /Search/Elements/SelectCalendarTimeSpan, %query &>
 
 <input type="submit" class="button" value="<%loc('Update Calendar')%>" />
@@ -49,15 +52,15 @@ $Year => (localtime)[5] + 1900
 </div>
 <%init>
 
+# Defaults
 if ( my $Search = RTx::Calendar::SearchDefaultCalendar($session{CurrentUser}) ) {
     $ARGS{'Format'} ||= $Search->SubValue('Format');
     $ARGS{'Query'}  ||= $Search->SubValue('Query');
     $ARGS{'OrderBy'} ||= $Search->SubValue('OrderBy');
     $ARGS{'Order'}   ||= $Search->SubValue('Order');
-    $ARGS{'RowsPerPage'}  ||= $Search->SubValue('RowsPerPage');
+    $ARGS{'RowsPerPage'} ||= $Search->SubValue('RowsPerPage');
 }
 
-# Default Query and Format
 $ARGS{'Format'} ||= RT->Config->Get('DefaultCalendarFormat');
 $ARGS{'Query'} ||= "( Status = 'new' OR Status = 'open' OR Status = 'stalled')
  AND ( Owner = '" . $session{CurrentUser}->Id ."' OR Owner = 'Nobody'  )
@@ -67,9 +70,10 @@ $ARGS{'Order'} ||= 'ASC';
 $ARGS{'RowsPerPage'} ||= '50';
 $ARGS{'TimeSpanOpen'} ||= '';
 $ARGS{'TimeSpanClose'} ||= '';
+$ARGS{'BoxFormat'} ||= '__QueueName__ #__id__ __Subject__';
 
 my @results;
-my @save_arguments = qw(Query Format OrderBy Order RowsPerPage TimeSpanOpen TimeSpanClose);
+my @save_arguments = qw(Query Format OrderBy Order RowsPerPage TimeSpanOpen TimeSpanClose BoxFormat);
 my $saved_search = { Type => 'Calendar' };
 my %query;
 for( @save_arguments ) {

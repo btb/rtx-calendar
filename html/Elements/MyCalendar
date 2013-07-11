@@ -19,7 +19,13 @@
 <td>
 <p class="date"><%$date->day%></p>
 % for my $t (@{ $Tickets{$date->strftime("%F")} }) {
-<& /Elements/CalendarEvent, Object => $t, Date => $date, DateTypes => \%DateTypes, Format => \@Format &>
+<& /Elements/CalendarEvent,
+    Object    => $t,
+    Date      => $date,
+    DateTypes => \%DateTypes,
+    Format    => \@Format,
+    BoxFormat => \@BoxFormat,
+&>
 % }
 </td>
 % $date = $set->next($date);
@@ -62,6 +68,7 @@ if ( my $Search = RTx::Calendar::SearchDefaultCalendar($session{CurrentUser}) ) 
   $Format = $Search->SubValue('Format');
   $Query = $Search->SubValue('Query');
 }
+my $BoxFormat = '__QueueName__ #__id__ __Subject__';
 
 # we search all date types in Format string
 my @Dates = grep { $Format =~ m/__${_}(Relative)?__/ } @DateTypes;
@@ -75,7 +82,9 @@ my %Tickets = RTx::Calendar::FindTickets($session{'CurrentUser'}, $Query, \@Date
 
 # Scrub the html of the format string to remove any potential nasties.
 $Format = $m->comp('/Elements/ScrubHTML', Content => $Format);
+$BoxFormat = $m->comp('/Elements/ScrubHTML', Content => $BoxFormat);
 
 my @Format = $m->comp('/Elements/CollectionAsTable/ParseFormat', Format => $Format);
+my @BoxFormat = $m->comp('/Elements/CollectionAsTable/ParseFormat', Format => "'$BoxFormat'");
 
 </%INIT>
