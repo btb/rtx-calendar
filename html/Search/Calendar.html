@@ -6,6 +6,7 @@ $Format => undef
 $Order => undef
 $OrderBy => undef
 $RowsPerPage => undef
+$BoxFormat => undef
 $NewQuery => 0
 </%args>
 
@@ -68,7 +69,13 @@ $NewQuery => 0
 >
 <p class="date"><%$date->day%></p>
 % for my $t ( @{ $Tickets{$date->strftime("%F")} } ) {
-<& /Elements/CalendarEvent, Object => $t, Date => $date, DateTypes => \%DateTypes, Format => \@Format &>
+<& /Elements/CalendarEvent,
+    Object    => $t,
+    Date      => $date,
+    DateTypes => \%DateTypes,
+    Format    => \@Format,
+    BoxFormat => \@BoxFormat,
+&>
 % }
 </td>
 % $date = $set->next($date);
@@ -155,7 +162,8 @@ my $QueryString =
         Format  => $Format,
         Order   => $Order,
         OrderBy => $OrderBy,
-        Rows    => $RowsPerPage
+        Rows    => $RowsPerPage,
+        BoxFormat => $BoxFormat,
       )
       if ($Query);
 
@@ -191,7 +199,9 @@ my %Tickets = RTx::Calendar::FindTickets($session{'CurrentUser'}, $TempQuery, \@
 
 # Scrub the html of the format string to remove any potential nasties.
 $TempFormat = $m->comp('/Elements/ScrubHTML', Content => $TempFormat);
+$BoxFormat = $m->comp('/Elements/ScrubHTML', Content => $BoxFormat);
 
 my @Format = $m->comp('/Elements/CollectionAsTable/ParseFormat', Format => $TempFormat);
+my @BoxFormat = $m->comp('/Elements/CollectionAsTable/ParseFormat', Format => "'$BoxFormat'");
 
 </%INIT>
