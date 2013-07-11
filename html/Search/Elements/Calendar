@@ -10,7 +10,41 @@ $TimeSpanOpen => undef
 $TimeSpanClose => undef
 $BoxFormat => undef
 $NewQuery => 0
+$CalendarType => 'full'
 </%args>
+%if ( $CalendarType eq 'week' ) {
+<table class="rtxcalendar">
+<thead>
+<tr>
+% my $date = $begin->clone;
+% while ( $date <= $end ) {
+<th width="14%"><%$rtdate->GetWeekday($date->day_of_week % 7)%></th>
+% $date = $set->next($date);
+% }
+</tr>
+</thead>
+<tbody>
+<tr>
+% $date = $begin->clone;
+% while ($date <= $end) {
+<td>
+<p class="date"><%$date->day%></p>
+% for my $t (@{ $Tickets{$date->strftime("%F")} }) {
+<& /Elements/CalendarEvent,
+    Object    => $t,
+    Date      => $date,
+    DateTypes => \%DateTypes,
+    Format    => \@Format,
+    BoxFormat => \@BoxFormat,
+&>
+% }
+</td>
+% $date = $set->next($date);
+% }
+</tr>
+</tbody>
+</table>
+%} else {
 <table width="100%">
 <tr>
 <td align="left">
@@ -46,6 +80,7 @@ $NewQuery => 0
 </thead>
 <tbody>
 <tr>
+% my $date = $begin->clone;
 % while ($date <= $end) {
 %   if ( $date->day_of_week == 1) {
 <th><% $date->week_number %></th>
@@ -121,6 +156,7 @@ $NewQuery => 0
 
 </td>
 </table>
+%}
 <%INIT>
 use RTx::Calendar;
 
@@ -129,8 +165,15 @@ my @DateTypes = qw/Created Starts Started Due LastUpdated Resolved/;
 my $rtdate = RT::Date->new($session{'CurrentUser'});
 
 my $today = DateTime->today;
-my $date  = RTx::Calendar::FirstMonday($Year, $Month + 1);
-my $end   = RTx::Calendar::LastSunday($Year, $Month + 1);
+
+my ($begin, $end);
+if ( $CalendarType eq 'week' ) {
+    $begin = $today->clone->subtract( days => 3);
+    $end   = $today->clone->add( days => 3);
+} else {
+    $begin = RTx::Calendar::FirstMonday($Year, $Month + 1);
+    $end   = RTx::Calendar::LastSunday($Year, $Month + 1);
+}
 
 # use this to loop over days until $end
 my $set = DateTime::Set->from_recurrence(
@@ -164,7 +207,7 @@ my %DateTypes = map { $_ => 1 } @Dates;
 
 # print STDERR ("-" x 30), "\n", $Query, "\n";
 
-my %Tickets = RTx::Calendar::FindTickets($session{'CurrentUser'}, $Query, \@Dates, $date, $end);
+my %Tickets = RTx::Calendar::FindTickets($session{'CurrentUser'}, $Query, \@Dates, $begin, $end);
 
 # Scrub the html of the format string to remove any potential nasties.
 $Format = $m->comp('/Elements/ScrubHTML', Content => $Format);

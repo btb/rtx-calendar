@@ -1,0 +1,11 @@
+<%args>
+$Name => 'CalendarType'
+$Default => 'month'
+</%args>
+<select id="<%$Name%>" name="<%$Name%>">
+% foreach my $option (qw(week month)) {
+% # 'week' # loc
+% # 'month' # loc
+<option value="<%$option%>"<% $option eq $Default ? qq[ selected="selected"] : '' |n %>><%loc($option)%></option>
+% }
+</select>

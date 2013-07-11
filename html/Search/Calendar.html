@@ -29,9 +29,14 @@ $Year => (localtime)[5] + 1900
 <div class="rtxcalendar-properties">
 <&| /Widgets/TitleBox, title => loc('Calendar Properties')&>
 
+<&|/l&>Calendar Type:</&>
+<& Elements/SelectCalendarType, Name => 'CalendarType', Default => $query{'CalendarType'} &>
+<br />
+
 <&|/l&>Box display format:</&>
 <input id="BoxFormat" name="BoxFormat" value="<% $query{'BoxFormat'} %>" size="50" />
 <br />
+
 <& /Search/Elements/SelectCalendarTimeSpan, %query &>
 
 <input type="submit" class="button" value="<%loc('Update Calendar')%>" />
@@ -72,9 +77,10 @@ $ARGS{'Order'} ||= 'ASC';
 $ARGS{'RowsPerPage'} ||= '50';
 $ARGS{'TimeSpanOpen'} ||= '';
 $ARGS{'TimeSpanClose'} ||= '';
+$ARGS{'CalendarType'} ||= 'month';
 
 my @results;
-my @save_arguments = qw(Query Format OrderBy Order RowsPerPage TimeSpanOpen TimeSpanClose BoxFormat);
+my @save_arguments = qw(Query Format OrderBy Order RowsPerPage TimeSpanOpen TimeSpanClose BoxFormat CalendarType);
 my $saved_search = { Type => 'Calendar' };
 my %query;
 for( @save_arguments ) {
