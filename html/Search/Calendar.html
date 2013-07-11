@@ -22,9 +22,18 @@ $Year => (localtime)[5] + 1900
 
 <div class="rtxcalendar-meta">
 <form method="get" action="<%RT->Config->Get('WebPath')%>/Search/Calendar.html">
-% foreach my $var ( @save_arguments ) {
+% foreach my $var ( qw(Query Format OrderBy Order RowsPerPage) ) {
 <input type="hidden" class="hidden" name="<%$var%>" value="<%$query{$var} || ''%>" />
 %}
+<div class="rtxcalendar-properties">
+<&| /Widgets/TitleBox, title => loc('Calendar Properties')&>
+
+<&|/l&>Calendar Type:</&>
+<& Elements/SelectCalendarType, Name => 'CalendarType', Default => $query{'CalendarType'} &>
+
+<input type="submit" class="button" value="<%loc('Update Calendar')%>" />
+</&>
+</div>
 
 <div class="saved-search">
 <input type="hidden" class="hidden" name="SavedSearchId" value="<% $saved_search->{Id} || 'new' %>" />
@@ -56,9 +65,10 @@ $ARGS{'Query'} ||= "( Status = 'new' OR Status = 'open' OR Status = 'stalled')
 $ARGS{'OrderBy'} ||= 'id';
 $ARGS{'Order'} ||= 'ASC';
 $ARGS{'RowsPerPage'} ||= '50';
+$ARGS{'CalendarType'} ||= 'month';
 
 my @results;
-my @save_arguments = qw(Query Format OrderBy Order RowsPerPage);
+my @save_arguments = qw(Query Format OrderBy Order RowsPerPage CalendarType);
 my $saved_search = { Type => 'Calendar' };
 my %query;
 for( @save_arguments ) {
