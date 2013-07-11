@@ -101,6 +101,11 @@ push @results, $m->comp( '/Search/Elements/EditSearches:Init',
 my $description = '';
 $description = $saved_search->{'Description'} if $saved_search->{'Description'};
 $ARGS{'SavedSearchId'} = $saved_search->{'Id'} if $saved_search->{'Id'};
+if ( $saved_search->{'Object'} ) {
+    for( @save_arguments ) {
+        $query{$_} ||= $ARGS{$_} ||= $saved_search->{'Object'}->SubValue($_) if $saved_search->{'Object'}->SubValue($_);
+    }
+}
 
 push @results, $m->comp( '/Search/Elements/EditSearches:Save',
     %ARGS,
