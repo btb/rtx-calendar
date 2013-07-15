@@ -37,7 +37,13 @@ $Year => (localtime)[5] + 1900
 <input id="BoxFormat" name="BoxFormat" value="<% $query{'BoxFormat'} %>" size="50" />
 <br />
 
-<& /Search/Elements/SelectCalendarTimeSpan, %query &>
+<&|/l_unsafe, $m->scomp('Elements/SelectCalendarDateType',
+                        Name => 'TimeSpanOpen',
+                        Default => $query{'TimeSpanOpen'}),
+              $m->scomp('Elements/SelectCalendarDateType',
+                        Name => 'TimeSpanClose',
+                        Default => $query{'TimeSpanClose'}) 
+&>Always display tickets between [_1] and [_2]</&>
 
 <input type="submit" class="button" value="<%loc('Update Calendar')%>" />
 </&>
